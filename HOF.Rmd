@@ -1,29 +1,40 @@
 ---
-title: "baseball"
+title: "baseball hall of fame"
 output: html_document
 date: '2022-06-28'
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(janitor)
+library(rvest)
+library(ggthemes)
 ```
 
-## R Markdown
+useful link: https://en.wikipedia.org/wiki/List_of_members_of_the_Baseball_Hall_of_Fame
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+```{r}
+wiki_url <- "https://en.wikipedia.org/wiki/List_of_members_of_the_Baseball_Hall_of_Fame"
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+data_list <- read_html(wiki_url) |> 
+  html_elements("table.wikitable.sortable") |> 
+  html_table()
+  
 
-```{r cars}
-summary(cars)
+data_table <- clean_names(data_list[[1]])
+
+
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r}
+  ggplot(data=data_table, mapping=aes(x=year)) +
+  geom_bar() +
+  coord_cartesian(xlim=c(1936,2022)) +
+  theme_solarized() +
+  labs(title="Baseball Hall of Fame Inductions",
+       y="Number of Inductees",
+       x="Year",
+       caption="Data: Wikipedia")
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
